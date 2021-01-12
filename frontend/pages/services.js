@@ -37,17 +37,17 @@ const ThemeModeConfig = (topic) => {
 }
 
 export async function getStaticProps() {
-    const topic = getThemeData()
+    const topicDate = getThemeData()
     return {
         props: {
-            topic,
+            topicDate,
         },
     }
 }
 
-function ServicesPage({ topic }) {
+function ServicesPage({ topicDate }) {
     const classes = useStyles();
-    const [ThemeMode, setThemeMode] = React.useState(topic)
+    const [ThemeMode, setThemeMode] = React.useState(topicDate)
 
     const theme = createMuiTheme({
         palette: {
