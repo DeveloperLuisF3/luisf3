@@ -119,7 +119,8 @@ export default function appBar({props, ThemeMode, DarkMode, LightMode, toggleDra
                 <p>CallMe</p>
             </MenuItem>
             <MenuItem>
-                {ThemeMode === "light" ? (
+                {ThemeMode === "light" 
+                ? (
                     <IconButton onClick={DarkMode}>
                         <Brightness2 />
                     </IconButton>
@@ -169,7 +170,8 @@ export default function appBar({props, ThemeMode, DarkMode, LightMode, toggleDra
                                     <CallIcon />
                                 </a>
                             </IconButton>
-                            {ThemeMode === "light" ? (
+                            {ThemeMode === "light" 
+                            ? (
                                 <IconButton onClick={DarkMode}>
                                     <Brightness2 />
                                 </IconButton>
