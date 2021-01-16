@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import Head from 'next/head'
 import Link from 'next/link'
 import Layout, { siteTitle } from '../components/layout/layout'
@@ -8,24 +8,13 @@ import Drawer from "@material-ui/core/Drawer"
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles"
 import purple from "@material-ui/core/colors/purple"
 import green from "@material-ui/core/colors/green"
-
 import List from "../components/navbar/List"
 import AppBar from "../components/navbar/AppBar"
-
 import Box from "@material-ui/core/Box"
 import Container from "@material-ui/core/Container"
+import firebase from "../firebase/firebase.config"
 
-import firebase from "firebase/app"
-import "firebase/database"
-import {
-    getThemeData,
-    firebaseConfig
-} from "../firebase/firebase.config"
 
-!firebase.apps.length && firebase.initializeApp(firebaseConfig)
-
-var database = firebase.database()
-var themeRef = database.ref(`/theme/ThemeMode`)
 
 const useStyles = makeStyles({
     list: {
@@ -36,24 +25,32 @@ const useStyles = makeStyles({
     },
 })
 
-const ThemeModeConfig = (topic) => {
+/*const ThemeModeConfig = (topic) => {
     console.log(topic)
     let ThemeMode = topic
     themeRef.set(ThemeMode)
-}
-
-export async function getStaticProps() {
-    const topic = getThemeData()
+}*/
+/*export async function getStaticProps() {
+    const topic = await getThemeData()
     return {
         props: {
-            topic
-        }
+            topic,
+        },
     }
-}
+}*/
 
 export default function HomePage({ topic }) {
     const classes = useStyles()
-    const [ThemeMode, setThemeMode] = React.useState(topic);
+    console.log(topic)
+
+    const [ThemeMode, setThemeMode] = React.useState(topic || 'light')
+
+    useEffect(() => {
+        let database = firebase.database()
+        let themeRef = database.ref(`/theme`)
+        themeRef.set(ThemeMode)
+        console.log(ThemeMode)
+    })
     
     const theme = createMuiTheme({
         palette: {
@@ -69,7 +66,7 @@ export default function HomePage({ topic }) {
                 dark: ThemeMode === "light" ? purple[800] : purple[300],
             },
         },
-    });
+    })
 
     const [state, setState] = React.useState({
         top: false,
@@ -86,7 +83,7 @@ export default function HomePage({ topic }) {
             return;
         }
         setState({ ...state, [anchor]: open });
-    };
+    }
 
     const list = (anchor) => (
         <div
@@ -99,15 +96,13 @@ export default function HomePage({ topic }) {
         >
             <List />
         </div>
-    );
+    )
     const handleDarkMode = () => {
         setThemeMode("dark")
-        ThemeModeConfig("dark")
-    };
+    }
     const handleLightMode = () => {
         setThemeMode("light")
-        ThemeModeConfig("light")
-    };
+    }
 
     return (
         <ThemeProvider theme={theme}>
