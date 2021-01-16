@@ -14,8 +14,6 @@ import Box from "@material-ui/core/Box"
 import Container from "@material-ui/core/Container"
 import firebase from "../firebase/firebase.config"
 
-
-
 const useStyles = makeStyles({
     list: {
         width: 250,
