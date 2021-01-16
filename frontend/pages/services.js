@@ -1,4 +1,5 @@
-import React from "react"
+
+import React, { useEffect } from "react"
 import Head from 'next/head'
 import Link from 'next/link'
 import Layout from '../components/layout/layout'
@@ -12,14 +13,9 @@ import green from "@material-ui/core/colors/green"
 import List from "../components/navbar/List"
 import AppBar from "../components/navbar/AppBar"
 
-import firebase from "firebase/app"
-import "firebase/database"
-import { getThemeData, firebaseConfig } from "../firebase/firebase.config"
+import firebase from "../firebase/firebase.config"
 
-!firebase.apps.length && firebase.initializeApp(firebaseConfig)
 
-var database = firebase.database()
-var themeRef = database.ref(`/theme/ThemeMode`)
 
 const useStyles = makeStyles({
     list: {
@@ -30,24 +26,32 @@ const useStyles = makeStyles({
     },
 })
 
-const ThemeModeConfig = (topic) => {
+/*const ThemeModeConfig = (topic) => {
     console.log(topic);
     let ThemeMode = topic;
     themeRef.set(ThemeMode)
-}
-
-export async function getStaticProps() {
-    const topicDate = getThemeData()
+}*/
+/*export async function getStaticProps() {
+    const topic = await getThemeData()
     return {
         props: {
-            topicDate,
+            topic,
         },
     }
-}
+}*/
 
-function ServicesPage({ topicDate }) {
-    const classes = useStyles();
-    const [ThemeMode, setThemeMode] = React.useState(topicDate)
+export default function ServicesPage({ topic }) {
+    const classes = useStyles()
+    console.log(topic)
+
+    const [ThemeMode, setThemeMode] = React.useState(topic || 'light')
+
+    useEffect(() => {
+        let database = firebase.database()
+        let themeRef = database.ref(`/theme`)
+        themeRef.set(ThemeMode)
+        console.log(ThemeMode)
+    })
 
     const theme = createMuiTheme({
         palette: {
@@ -63,24 +67,24 @@ function ServicesPage({ topicDate }) {
                 dark: ThemeMode === "light" ? purple[800] : purple[300],
             },
         },
-    });
+    })
 
     const [state, setState] = React.useState({
         top: false,
         left: false,
         bottom: false,
         right: false,
-    });
+    })
 
     const toggleDrawer = (anchor, open) => (event) => {
         if (
             event.type === "keydown" &&
             (event.key === "Tab" || event.key === "Shift")
         ) {
-            return;
+            return
         }
-        setState({ ...state, [anchor]: open });
-    };
+        setState({ ...state, [anchor]: open })
+    }
 
     const list = (anchor) => (
         <div
@@ -93,15 +97,13 @@ function ServicesPage({ topicDate }) {
         >
             <List />
         </div>
-    );
+    )
     const handleDarkMode = () => {
-        ThemeModeConfig("dark")
-        setThemeMode("dark");
-    };
+        setThemeMode("dark")
+    }
     const handleLightMode = () => {
-        ThemeModeConfig("light")
-        setThemeMode("light");
-    };
+        setThemeMode("light")
+    }
     return (
         <ThemeProvider theme={theme}>
             <Layout>
@@ -134,7 +136,5 @@ function ServicesPage({ topicDate }) {
                 </h2>
             </Layout>
         </ThemeProvider>
-    );
+    )
 }
-
-export default ServicesPage;
