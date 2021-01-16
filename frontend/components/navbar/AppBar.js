@@ -62,7 +62,7 @@ HideOnScroll.propTypes = {
     window: PropTypes.func,
 }
 
-export default function appBar({props, ThemeMode, DarkMode, LightMode, toggleDrawer,}) {
+export default function appBar({ props, ThemeMode, DarkMode, LightMode, toggleDrawer, }) {
     const classes = useStyles()
 
     const [anchorEl, setAnchorEl] = React.useState(null)
