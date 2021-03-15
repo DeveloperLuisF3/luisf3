@@ -1,38 +1,78 @@
-import React from "react"
-import PropTypes from "prop-types"
-import AppBar from "@material-ui/core/AppBar"
-import Toolbar from "@material-ui/core/Toolbar"
-import IconButton from "@material-ui/core/IconButton"
-import Typography from "@material-ui/core/Typography"
-import { makeStyles } from "@material-ui/core/styles"
-import MenuItem from "@material-ui/core/MenuItem"
-import Menu from "@material-ui/core/Menu"
-import MenuIcon from "@material-ui/icons/Menu"
-import CallIcon from "@material-ui/icons/Call"
-import AccountCircle from "@material-ui/icons/AccountCircle"
-import MoreIcon from "@material-ui/icons/MoreVert"
-import { Brightness4, Brightness2 } from "@material-ui/icons"
-import useScrollTrigger from "@material-ui/core/useScrollTrigger"
-import Slide from "@material-ui/core/Slide"
+import React from "react";
+import {
+    useContext,
+    useEffect
+} from "react";
+import UserContext from "../../context/Users/UserContext";
+import clsx from "clsx";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
+import Drawer from "@material-ui/core/Drawer";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from '@material-ui/core/Typography';
+import Divider from "@material-ui/core/Divider";
+import IconButton from "@material-ui/core/IconButton";
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
+import MenuIcon from "@material-ui/icons/Menu";
+import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import CallIcon from '@material-ui/icons/Call';
+import AccountCircle from '@material-ui/icons/AccountCircle';
+import MoreIcon from '@material-ui/icons/MoreVert';
+import { Brightness4, Brightness2, Height, Unsubscribe } from '@material-ui/icons';
+import Avatar from "@material-ui/core/Avatar";
 
-const anchor = "left"
+// components
+import List from "../navbar/List";
+
+// firebase
+import firebase, { logOut, deleteUser } from '../../firebase/firebase.config';
+
+const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
     navbar: {
-        flexGrow: 1,
+        display: "flex",
+    },
+    appBar: {
+        zIndex: theme.zIndex.drawer + 1,
+        transition: theme.transitions.create(["width", "margin"], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreenl,
+        }),
+        backgroundColor: theme.palette.backgroundNavbar.main,
+        color: theme.palette.text.primary,
+    },
+    appBarShift: {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create(["width", "margin"], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
     },
     menuButton: {
         marginRight: theme.spacing(2),
     },
-    toolbar: {
-        minHeight: 128,
-        alignItems: "flex-start",
-        paddingTop: theme.spacing(1),
-        paddingBottom: theme.spacing(2),
+    hide: {
+        display: "none",
     },
     title: {
         flexGrow: 1,
-        alignSelf: "flex-end",
+        alignSelf: "flex-center",
+    },
+    tel: {
+        color: theme.palette.text.primary,
+    },
+    wrapperAvatar: {
+        display: "flex",
+        "& > *": {
+            margin: theme.spacing(1),
+        },
+    },
+    telMobil: {
+        marginLeft: "1%",
     },
     sectionDesktop: {
         display: "none",
@@ -46,44 +86,100 @@ const useStyles = makeStyles((theme) => ({
             display: "none",
         },
     },
-}))
+    drawer: {
+        width: drawerWidth,
+        flexShrink: 0,
+        whiteSpace: "nowrap",
+    },
+    drawerOpen: {
+        width: drawerWidth,
+        transition: theme.transitions.create("width", {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    },
+    drawerClose: {
+        transition: theme.transitions.create("width", {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+        overflowX: "hidden",
+        width: theme.spacing(7) + 1,
+        [theme.breakpoints.up("sm")]: {
+            width: theme.spacing(9) + 1,
+        },
+    },
+    toolbar: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        padding: theme.spacing(0, 1),
+        ...theme.mixins.toolbar,
+    },
+}));
 
-function HideOnScroll(props) {
-    const { children, window } = props;
-    const trigger = useScrollTrigger({ target: window ? window() : undefined })
-    return (
-        <Slide appear={false} direction="down" in={!trigger}>
-            {children}
-        </Slide>
-    )
-}
-HideOnScroll.propTypes = {
-    children: PropTypes.element.isRequired,
-    window: PropTypes.func,
-}
+export default function appBar({ children, ThemeMode, DarkMode, LightMode }) {
+    const {
+        login,
+        HandleLogin,
+        HandleSesion
+    } = useContext(UserContext);
+    const classes = useStyles();
+    const theme = useTheme();
+    const [open, setOpen] = React.useState(false);
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
-export default function appBar({ props, ThemeMode, DarkMode, LightMode, toggleDrawer, }) {
-    const classes = useStyles()
+    useEffect(() => {
+        let unsubscribe = firebase.auth().onAuthStateChanged((u) => {
+            try {
+                if (u) {
+                    localStorage.setItem('user', JSON.stringify(u));
+                    HandleSesion(u);
+                } else {
+                    console.log("luisf3 =>" + + u);
+                    HandleSesion(u);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        })
+        return () => unsubscribe();
+    }, [login]);
 
-    const [anchorEl, setAnchorEl] = React.useState(null)
-    const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null)
+    let HandlePopupLogin = (e) => {
+        console.log(e);
+    };
 
     const isMenuOpen = Boolean(anchorEl);
-    const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
+    const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+    const handleDrawerOpen = () => {
+        setOpen(true);
+    };
+
+    const handleDrawerClose = () => {
+        setOpen(false);
+    };
+
+    const handleProfileMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
 
     const handleMobileMenuClose = () => {
-        setMobileMoreAnchorEl(null)
-    }
+        setMobileMoreAnchorEl(null);
+    };
+
     const handleMenuClose = () => {
         setAnchorEl(null);
         handleMobileMenuClose();
-    }
+    };
 
     const handleMobileMenuOpen = (event) => {
-        setMobileMoreAnchorEl(event.currentTarget)
-    }
+        setMobileMoreAnchorEl(event.currentTarget);
+    };
 
-    const menuId = "primary-search-account-menu";
+    const menuId = 'primary-search-account-menu';
     const renderMenu = (
         <Menu
             anchorEl={anchorEl}
@@ -94,33 +190,53 @@ export default function appBar({ props, ThemeMode, DarkMode, LightMode, toggleDr
             open={isMenuOpen}
             onClose={handleMenuClose}
         >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+            <MenuItem
+                onClick={login ? logOut : HandleLogin}
+            >
+                {login ? "Cerrar Sesión" : "Iniciar Sesión"}
+            </MenuItem>
+            {login ?
+                <MenuItem
+                    onClick={deleteUser}
+                >
+                    Salir
+                </MenuItem>
+                :
+                <MenuItem>
+                    Bienvenida(o) A Mi App
+                </MenuItem>
+            }
+            <MenuItem>
+                {login ? login.displayName : "inicia Sesión Por Favor!"}
+            </MenuItem>
         </Menu>
-    )
+    );
 
-    const mobileMenuId = "primary-search-account-menu-mobile";
+    const mobileMenuId = 'primary-search-account-menu-mobile';
     const renderMobileMenu = (
         <Menu
             anchorEl={mobileMoreAnchorEl}
-            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             id={mobileMenuId}
             keepMounted
-            transformOrigin={{ vertical: "top", horizontal: "right" }}
+            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
             open={isMobileMenuOpen}
             onClose={handleMobileMenuClose}
         >
             <MenuItem>
-                <IconButton edge="start" aria-label="call">
-                    <a href="tel:+525534296773">
+                <IconButton
+                    edge="start"
+                    aria-label="call"
+                    className={classes.telMobil}
+                >
+                    <a className={classes.tel} href="tel:+525534296773">
                         <CallIcon />
                     </a>
                 </IconButton>
                 <p>CallMe</p>
             </MenuItem>
             <MenuItem>
-                {ThemeMode === "light" 
-                ? (
+                {ThemeMode === "light" ? (
                     <IconButton onClick={DarkMode}>
                         <Brightness2 />
                     </IconButton>
@@ -131,7 +247,7 @@ export default function appBar({ props, ThemeMode, DarkMode, LightMode, toggleDr
                 )}
                 <p>Theme</p>
             </MenuItem>
-            <MenuItem>
+            <MenuItem onClick={handleProfileMenuOpen}>
                 <IconButton
                     aria-label="account of current user"
                     aria-controls="primary-search-account-menu"
@@ -142,69 +258,119 @@ export default function appBar({ props, ThemeMode, DarkMode, LightMode, toggleDr
                 <p>Profile</p>
             </MenuItem>
         </Menu>
-    )
+    );
 
     return (
         <div className={classes.navbar}>
-            <HideOnScroll {...props}>
-                <AppBar>
-                    <Toolbar className={classes.toolbar}>
+            <AppBar
+                position="fixed"
+                className={clsx(classes.appBar, {
+                    [classes.appBarShift]: open,
+                })}
+            >
+                <Toolbar>
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={handleDrawerOpen}
+                        edge="start"
+                        className={clsx(classes.menuButton, {
+                            [classes.hide]: open,
+                        })}
+                    >
+                        <MenuIcon />
+                    </IconButton>
+                    <Typography
+                        className={classes.title}
+                        variant="h6"
+                        noWrap
+                    >
+                        Developer LuisF3
+                    </Typography>
+                    <div className={classes.navbar} />
+                    <div className={classes.sectionDesktop}>
                         <IconButton
                             edge="start"
-                            className={classes.menuButton}
-                            aria-label="open drawer"
-                            onClick={toggleDrawer(anchor, true)}
+                            aria-label="call"
                         >
-                            <MenuIcon />
+                            <a className={classes.tel} href="tel:+525534296773">
+                                <CallIcon />
+                            </a>
                         </IconButton>
-                        <Typography className={classes.title} variant="h5" noWrap>
-                            Developer LuisF3
-                        </Typography>
-                        <div className={classes.navbar} />
-                        <div className={classes.sectionDesktop}>
+                        {ThemeMode === "light" ? (
                             <IconButton
-                                edge="start"
-                                aria-label="call"
+                                onClick={login ? DarkMode : HandlePopupLogin}
                             >
-                                <a href="tel:+525534296773">
-                                    <CallIcon />
-                                </a>
+                                <Brightness2 />
                             </IconButton>
-                            {ThemeMode === "light" 
-                            ? (
-                                <IconButton onClick={DarkMode}>
-                                    <Brightness2 />
-                                </IconButton>
-                            ) : (
-                                <IconButton onClick={LightMode}>
-                                    <Brightness4 />
-                                </IconButton>
-                            )}
+                        ) : (
                             <IconButton
-                                aria-label="account of current user"
-                                aria-controls="primary-search-account-menu"
-                                aria-haspopup="true"
+                                onClick={login ? LightMode : HandlePopupLogin}
                             >
-                                <AccountCircle />
+                                <Brightness4 />
                             </IconButton>
-                        </div>
-                        <div className={classes.sectionMobile}>
-                            <IconButton
-                                aria-label="display more actions"
-                                edge="end"
-                                aria-controls={mobileMenuId}
-                                aria-haspopup="true"
-                                onClick={handleMobileMenuOpen}
-                            >
-                                <MoreIcon />
-                            </IconButton>
-                        </div>
-                    </Toolbar>
-                </AppBar>
-            </HideOnScroll>
-            <Toolbar className={classes.toolbar} />
+                        )}
+                        <IconButton
+                            edge="end"
+                            aria-label="account of current user"
+                            aria-controls={menuId}
+                            aria-haspopup="true"
+                            onClick={handleProfileMenuOpen}
+                            color="inherit"
+                        >
+                            <AccountCircle />
+                        </IconButton>
+                    </div>
+                    <div className={classes.wrapperAvatar}>
+                        <Avatar
+                            alt="You Photo"
+                            src={login ? login.photoURL : "images/iconluisf3.png"}
+                        />
+                    </div>
+                    <div className={classes.sectionMobile}>
+                        <IconButton
+                            aria-label="show more"
+                            aria-controls={mobileMenuId}
+                            aria-haspopup="true"
+                            onClick={handleMobileMenuOpen}
+                            color="inherit"
+                        >
+                            <MoreIcon />
+                        </IconButton>
+                    </div>
+                </Toolbar>
+            </AppBar>
+            <Drawer
+                variant="permanent"
+                className={clsx(classes.drawer, {
+                    [classes.drawerOpen]: open,
+                    [classes.drawerClose]: !open,
+                })}
+                classes={{
+                    paper: clsx({
+                        [classes.drawerOpen]: open,
+                        [classes.drawerClose]: !open,
+                    }),
+                }}
+            >
+                <div className={classes.toolbar}>
+                    <IconButton onClick={handleDrawerClose}>
+                        {theme.direction === "rtl" ? (
+                            <ChevronRightIcon />
+                        ) : (
+                            <ChevronLeftIcon />
+                        )}
+                    </IconButton>
+                </div>
+                <Divider />
+                <List />
+            </Drawer>
             {renderMobileMenu}
             {renderMenu}
+            <main className={classes.content}>
+                <div className={classes.toolbar} />
+                <div>{children}</div>
+            </main>
         </div>
-    )
-}
+    );
+};
