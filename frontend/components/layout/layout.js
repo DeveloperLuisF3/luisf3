@@ -1,8 +1,8 @@
-import Head from 'next/head'
+import Head from 'next/head';
 
-import styles from "../../styles/layout/layout.module.css"
+import styles from "../../styles/layout/layout.module.css";
 
-export const siteTitle = 'Developer LuisF3'
+export const siteTitle = 'Developer LuisF3';
 
 export default function Layout({ children }) {
     return (
@@ -38,4 +38,4 @@ export default function Layout({ children }) {
             <div>{children}</div>
         </div>
     );
-}
+};
