@@ -1,6 +1,6 @@
 # LuisF3
 
-![My App](frontend/public/images/iconluisf3.png "Icon LuisF3")
+![My App](public/images/iconluisf3.png "Icon LuisF3")
 
 ## DeveloperLuisF3 App: Desarrollo con HTML, CSS, Javascript, Reactjs, MaterialUI, Nextjs, NodeJs, Firebase y Vercel.
 
