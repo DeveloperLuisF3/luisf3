@@ -7,7 +7,8 @@ import { loginWithGoogle } from "../../firebase/users/firebaseLogin";
 
 const UserState = (props) => {
 	const initialState = {
-		login: null
+		login: null,
+		ThemeMode: "light"
 	};
 
 	const [state, dispatch] = useReducer(UserReducer, initialState);
@@ -23,10 +24,17 @@ const UserState = (props) => {
 	};
 
 	let HandleSesion = (u) => {
-		console.log(u);
 		dispatch({
 			type: "USER_SESION",
 			payload: u
+		})
+	};
+
+	let HandleTheme = (topic) => {
+		console.log(topic);
+		dispatch({
+			type: "HANDLE_THEME",
+			payload: topic
 		})
 	};
 
@@ -34,8 +42,10 @@ const UserState = (props) => {
 		<UserContext.Provider
 			value={{
 				login: state.login,
+				ThemeMode: state.ThemeMode,
 				HandleLogin,
 				HandleSesion,
+				HandleTheme
 			}}
 		>
 			{ props.children}
