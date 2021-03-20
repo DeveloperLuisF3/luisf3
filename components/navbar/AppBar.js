@@ -325,7 +325,7 @@ export default function appBar({ children, HandleLightMode, HandleDarkMode }) {
 					<div className={classes.wrapperAvatar}>
 						<Avatar
 							alt="You Photo"
-							src={login ? login.photoURL : "images/iconasluisf3.png"}
+							src={login ? login.photoURL : "images/iconluisf3.png"}
 						/>
 					</div>
 					<div className={classes.sectionMobile}>

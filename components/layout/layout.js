@@ -73,7 +73,7 @@ let Layout = ({ children }) => {
 		<ThemeProvider theme={theme}>
 			<div className={styles.container}>
 				<Head>
-					<link rel="icon" href="/images/iconasluisf3.png" type="image/png" />
+					<link rel="icon" href="/images/luisf3.png" type="image/png" />
 					<link
 						rel="stylesheet"
 						href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
