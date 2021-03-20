@@ -2,6 +2,8 @@ import React from "react";
 import { useContext, useEffect } from "react";
 import UserContext from "../../context/Users/UserContext";
 import clsx from "clsx";
+
+// Material UI
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
@@ -115,17 +117,19 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-export default function appBar({ children, ThemeMode, DarkMode, LightMode }) {
-	const {
+export default function appBar({ children, HandleLightMode, HandleDarkMode }) {
+	let {
 		login,
+		ThemeMode,
 		HandleLogin,
 		HandleSesion
 	} = useContext(UserContext);
-	const classes = useStyles();
-	const theme = useTheme();
-	const [open, setOpen] = React.useState(false);
-	const [anchorEl, setAnchorEl] = React.useState(null);
-	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+	console.log(ThemeMode);
+	let classes = useStyles();
+	let theme = useTheme();
+	let [open, setOpen] = React.useState(false);
+	let [anchorEl, setAnchorEl] = React.useState(null);
+	let [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
 	useEffect(() => {
 		let unsubscribe = firebase.auth().onAuthStateChanged((u) => {
@@ -142,7 +146,7 @@ export default function appBar({ children, ThemeMode, DarkMode, LightMode }) {
 			}
 		})
 		return () => unsubscribe();
-	}, [login]);
+	}, [login, ThemeMode]);
 
 	let HandlePopupLogin = (e) => {
 		console.log(e);
@@ -234,11 +238,11 @@ export default function appBar({ children, ThemeMode, DarkMode, LightMode }) {
 			</MenuItem>
 			<MenuItem>
 				{ThemeMode === "light" ? (
-					<IconButton onClick={DarkMode}>
+					<IconButton onClick={login ? HandleDarkMode : HandlePopupLogin}>
 						<Brightness2 />
 					</IconButton>
 				) : (
-					<IconButton onClick={LightMode}>
+					<IconButton onClick={login ? HandleLightMode : HandlePopupLogin}>
 						<Brightness4 />
 					</IconButton>
 				)}
@@ -296,13 +300,13 @@ export default function appBar({ children, ThemeMode, DarkMode, LightMode }) {
 						</IconButton>
 						{ThemeMode === "light" ? (
 							<IconButton
-								onClick={login ? DarkMode : HandlePopupLogin}
+								onClick={login ? HandleDarkMode : HandlePopupLogin}
 							>
 								<Brightness2 />
 							</IconButton>
 						) : (
 							<IconButton
-								onClick={login ? LightMode : HandlePopupLogin}
+								onClick={login ? HandleLightMode : HandlePopupLogin}
 							>
 								<Brightness4 />
 							</IconButton>
@@ -321,7 +325,7 @@ export default function appBar({ children, ThemeMode, DarkMode, LightMode }) {
 					<div className={classes.wrapperAvatar}>
 						<Avatar
 							alt="You Photo"
-							src={login ? login.photoURL : "images/iconluisf3.png"}
+							src={login ? login.photoURL : "images/iconasluisf3.png"}
 						/>
 					</div>
 					<div className={classes.sectionMobile}>
