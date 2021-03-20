@@ -1,4 +1,5 @@
 import firebase from "../firebase.config";
+import { createTheme, deleteTheme } from "./firebaseTheme";
 
 // variables
 let db = firebase.firestore();
@@ -15,6 +16,7 @@ export let loginWithGoogle = () => {
 			console.log(user);
 			localStorage.setItem("user", JSON.stringify(result.user));
 			createUser(user);
+			// createTheme();
 			return result.user;
 		})
 		.catch((error) => {
@@ -35,6 +37,7 @@ let createUser = (user) => {
 		.set({ userObject })
 		.then(() => {
 			console.log("User Created");
+			createTheme();
 		})
 		.catch((error) => {
 			console.log("Qué gusto verte de nuevo!");
@@ -51,6 +54,7 @@ export let logOut = () => {
 export let deleteUser = () => {
 	let delUser = firebase.auth().currentUser;
 	console.log(delUser.uid);
+	deleteTheme();
 	usersRef
 		.doc(delUser.uid)
 		.delete()
