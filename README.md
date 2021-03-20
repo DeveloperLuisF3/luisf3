@@ -12,7 +12,7 @@
     * Dependencias
         * Frontend
         * Backend
-2. [Frontend](https://github.com/DeveloperLuisF3/LuisF3/tree/main/frontend "Ir a frontend")
+3. [App](https://github.com/DeveloperLuisF3/LuisF3/tree/main/frontend "Ir a frontend")
     * components
         * layout
             * layout.js
