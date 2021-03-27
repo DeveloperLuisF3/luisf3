@@ -28,7 +28,7 @@ let Layout = ({ children }) => {
 	console.log(ThemeMode);
 	console.log(login);
 
-	useEffect(() => {
+	/* useEffect(() => {
 		if (login) {
 			let unsubscribe = themeRef.doc(login.uid).onSnapshot((doc) => {
 				console.log("Current data: ", doc.data().themeObject.ThemeMode);
@@ -38,7 +38,7 @@ let Layout = ({ children }) => {
 			return () => unsubscribe();
 		}
 		else { console.log("not user") };
-	}, [ThemeMode, login]);
+	}, [ThemeMode, login]); */
 
 	let theme = createMuiTheme({
 		palette: {
@@ -99,12 +99,23 @@ let Layout = ({ children }) => {
 					<meta
 						name="twitter:card" content="summary_large_image"
 					/>
+					<meta
+						name="google-signin-client_id"
+						content="851943661708-1cfusnocjus21jlhlrj4k5m95b5emd13.apps.googleusercontent.com"
+					/>
+					<script
+						src="https://apis.google.com/js/platform.js"
+						async
+						defer
+					>
+					</script>
 				</Head>
 				<AppBar
 					// ThemeMode={ThemeMode}
 					HandleDarkMode={HandleDarkMode}
 					HandleLightMode={HandleLightMode}
 				>
+
 					<div>{children}</div>
 				</AppBar>
 			</div>

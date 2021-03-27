@@ -210,6 +210,7 @@ export default function appBar({ children, HandleLightMode, HandleDarkMode }) {
 			<MenuItem>
 				{login ? login.displayName : "Inicia Sesión Por Favor!"}
 			</MenuItem>
+			<div className="g-signin2" data-onsuccess="onSignIn"></div>
 		</Menu>
 	);
 
